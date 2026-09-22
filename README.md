@@ -40,6 +40,25 @@ Your dotfile setup is complete!
 
 Treat your dotfile management system like any other Git project. Make any changes in the `dotfiles` directory.
 
+### Restoring Claude Code sessions after a restart
+
+`SessionStart`/`SessionEnd` hooks keep a registry of open Claude Code sessions in
+`~/.claude/live-sessions` (`.claude/session-registry.sh`). After rebooting, run:
+
+```
+claude-restore
+```
+
+It lists the sessions that went down with the machine — name, age, directory, and
+the last few prompts in the preview — with everything preselected. Enter opens one
+WezTerm tab per session, resuming each by id and re-applying any name set with
+`-n` or `/rename`.
+
+`--all` skips the picker, `--list` just prints, `--all-closed` widens the list to
+every session closed before the reboot, and `--seed` records the sessions that are
+open right now (needed once, since sessions started before the hooks existed were
+never registered).
+
 ### Work config file
 Optionally, create a file in your home directory called `workconfig.zsh`. Here you will add any exports or PATH changes only needed for a work machine.
 
