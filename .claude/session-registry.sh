@@ -2,9 +2,12 @@
 # Records which Claude Code sessions are open, so restore-sessions.sh can bring
 # them back after a reboot.
 #
-# SessionStart writes one file per session, SessionEnd deletes it. A session
-# killed by a restart never fires SessionEnd, so whatever is left behind in the
-# registry is exactly the set that died with the machine.
+# SessionStart writes one file per session, SessionEnd stamps it. A session
+# killed by a restart never fires SessionEnd, so whatever is left unstamped in
+# the registry is exactly the set that died with the machine.
+#
+# This runs on every session start and end, so it does its JSON reading in a
+# single jq call per event rather than one per field.
 
 REGISTRY="${CLAUDE_SESSION_REGISTRY:-$HOME/.claude/live-sessions}"
 
@@ -18,8 +21,8 @@ esac
 input=$(cat)
 [ -n "$input" ] || exit 0
 
-event=$(printf '%s' "$input" | jq -r '.hook_event_name // empty' 2>/dev/null)
-id=$(printf '%s' "$input" | jq -r '.session_id // empty' 2>/dev/null)
+{ read -r event; read -r id; } < <(
+    printf '%s' "$input" | jq -r '[.hook_event_name, .session_id] | map(. // "") | .[]' 2>/dev/null)
 [ -n "$id" ] || exit 0
 
 case "$event" in
@@ -28,7 +31,7 @@ case "$event" in
         # session_title is the name at startup only; /rename after this point
         # lands in the transcript, which is where restore-sessions.sh reads it.
         printf '%s' "$input" \
-            | jq -c '{session_id, cwd, title: (.session_title // ""), recorded_at: (now | floor)}' \
+            | jq -c '{session_id, cwd, title: (.session_title // "")}' \
                 > "$REGISTRY/.$id.tmp" 2>/dev/null \
             && mv -f "$REGISTRY/.$id.tmp" "$REGISTRY/$id.json" 2>/dev/null
         ;;
@@ -38,8 +41,8 @@ case "$event" in
         # exactly the wrong moment. Record how and when it ended instead and let
         # restore-sessions.sh decide.
         [ -f "$REGISTRY/$id.json" ] || exit 0
-        reason=$(printf '%s' "$input" | jq -r '.reason // "unknown"' 2>/dev/null)
-        jq -c --arg reason "$reason" '. + {ended_at: (now | floor), end_reason: $reason}' \
+        jq -c --argjson hook "$input" \
+            '. + {ended_at: (now | floor), end_reason: ($hook.reason // "unknown")}' \
             "$REGISTRY/$id.json" > "$REGISTRY/.$id.tmp" 2>/dev/null \
             && mv -f "$REGISTRY/.$id.tmp" "$REGISTRY/$id.json" 2>/dev/null
         ;;
