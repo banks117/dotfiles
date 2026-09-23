@@ -71,4 +71,6 @@ alias gtok="gcloud auth print-access-token |tr -d '\n' | pbcopy"
 alias uuidgen='uuidgen | tr "[:upper:]" "[:lower:]"'
 
 alias claude='claude --allow-dangerously-skip-permissions'
+# Reopen the Claude Code sessions that were open before the last restart.
+alias claude-restore='bash ~/.claude/restore-sessions.sh'
 alias copilot="copilot --yolo"
