@@ -72,3 +72,20 @@ alias uuidgen='uuidgen | tr "[:upper:]" "[:lower:]"'
 
 alias claude='claude --allow-dangerously-skip-permissions'
 alias copilot="copilot --yolo"
+# Launch claude in an sbx sandbox from the custom template.
+# Reattach if a sandbox for this dir exists; else create it from the template.
+# Every launch, merge host prefs (statusline, spinner verbs, editor mode, ...)
+# into the settings.json sbx regenerates on create, and pin the model via env.
+# hooks/model are dropped: host-specific (macOS osascript, host paths) or set via
+# ANTHROPIC_MODEL. gopls-lsp is dropped because gopls isn't in the sandbox image.
+sbxc() {
+  local name="claude-$(basename "$PWD")"
+  if ! sbx ls -q 2>/dev/null | grep -qx "$name"; then
+    sbx run -t claude-custom:v1 --name "$name" -d claude >/dev/null || return
+  fi
+  jq 'del(.hooks, .model, .enabledPlugins["gopls-lsp@claude-plugins-official"]) | .env.ANTHROPIC_MODEL = "opus"' ~/.claude/settings.json \
+    | sbx exec "$name" -- sh -c 'cat > /tmp/host.json && cd /home/agent/.claude && jq -s ".[0] * .[1]" settings.json /tmp/host.json > settings.tmp && mv settings.tmp settings.json && rm /tmp/host.json'
+  # Vendor the statusline script referenced by statusLine.command into the sandbox.
+  [ -f ~/.claude/statusline.sh ] && sbx exec "$name" -- sh -c 'rm -f /home/agent/.claude/statusline.sh && cat > /home/agent/.claude/statusline.sh' < ~/.claude/statusline.sh
+  sbx run --name "$name"
+}
