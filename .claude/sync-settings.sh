@@ -12,7 +12,8 @@ if [ -f "$OVERLAY" ]; then
     merged=$(jq -s '
         def merge($a; $b):
             if ($a | type) == "object" and ($b | type) == "object" then
-                reduce ($b | keys_unsorted[]) as $k ($a; .[$k] = merge($a[$k]; $b[$k]))
+                reduce ($b | keys_unsorted[]) as $k ($a;
+                    if $b[$k] == null then del(.[$k]) else .[$k] = merge($a[$k]; $b[$k]) end)
             elif ($a | type) == "array" and ($b | type) == "array" then
                 $a + $b
             else
