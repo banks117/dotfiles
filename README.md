@@ -54,7 +54,9 @@ if it exists. Put work-only settings (plugins, marketplaces, extra hooks or
 permissions) in the overlay. It lives outside the repo, so it is never tracked.
 
 Objects merge key by key and arrays are appended, so the overlay only needs what it
-adds. Rerun the script after editing either file:
+adds. A `null` value removes the key from the base, e.g. `"attribution": null` restores
+Claude Code's default commit and PR attribution. Rerun the script after editing either
+file:
 
 ```
 ~/.claude/sync-settings.sh
