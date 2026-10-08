@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f '/Users/banks/.claude/hooks/herdr-agent-state.sh' ] || exit 0; bash '/Users/banks/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
@@ -62,7 +74,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'set -a && source /etc/claude-logger.conf && set +a && python3 /usr/local/bin/claude_code_session_logger.py'",
+            "command": "[ -f /etc/claude-logger.conf ] && [ -f /usr/local/bin/claude_code_session_logger.py ] || exit 0; bash -c 'set -a && source /etc/claude-logger.conf && set +a && python3 /usr/local/bin/claude_code_session_logger.py'",
             "timeout": 30
           }
         ]
@@ -73,7 +85,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'set -a && source /etc/claude-logger.conf && set +a && python3 /usr/local/bin/claude_code_session_logger.py'",
+            "command": "[ -f /etc/claude-logger.conf ] && [ -f /usr/local/bin/claude_code_session_logger.py ] || exit 0; bash -c 'set -a && source /etc/claude-logger.conf && set +a && python3 /usr/local/bin/claude_code_session_logger.py'",
             "timeout": 30
           }
         ]
@@ -85,7 +97,8 @@
     "command": "bash ~/.claude/statusline.sh"
   },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
   },
   "spinnerVerbs": {
     "mode": "replace",
@@ -130,10 +143,17 @@
       "There is more to this than meets the eye"
     ]
   },
+  "tui": "default",
   "effortLevel": "high",
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "editorMode": "vim",
   "voiceEnabled": true,
-  "model": "opus[1m]"
+  "agentPushNotifEnabled": true,
+  "model": "opus",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
 }
