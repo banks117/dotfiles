@@ -46,3 +46,19 @@ Optionally, create a file in your home directory called `workconfig.zsh`. Here y
 ```
 touch ~/workconfig.zsh
 ```
+
+### Work Claude Code settings
+`~/.claude/settings.json` is generated rather than stowed. `.claude/sync-settings.sh`
+builds it from the tracked `.claude/settings.json`, plus `~/.claude/work.settings.json`
+if it exists. Put work-only settings (plugins, marketplaces, extra hooks or
+permissions) in the overlay. It lives outside the repo, so it is never tracked.
+
+Objects merge key by key and arrays are appended, so the overlay only needs what it
+adds. Rerun the script after editing either file:
+
+```
+~/.claude/sync-settings.sh
+```
+
+Changes made through Claude Code itself (`/model`, `/config`, plugin installs) only
+land in the generated file, so copy anything worth keeping into the base or overlay.
