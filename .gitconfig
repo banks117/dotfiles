@@ -1,6 +1,6 @@
 [user]
 	name = Brandon Banks
-	email = 10030196+brandonmbanks@users.noreply.github.com
+	email = 10030196+banks117@users.noreply.github.com
 [push]
 	default = simple
 [core]
@@ -31,4 +31,6 @@
 [rerere]
 	enabled = true
 [includeIf "hasconfig:remote.*.url:git@github.com:emeraldbanks/**"]
+  path = ~/.gitconfig.emeraldbanks
+[includeIf "hasconfig:remote.*.url:https://github.com/emeraldbanks/**"]
   path = ~/.gitconfig.emeraldbanks
