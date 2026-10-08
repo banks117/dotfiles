@@ -76,3 +76,6 @@ fi
 
 # symlink dotfiles
 stow .
+
+# build ~/.claude/settings.json (base + optional work overlay)
+./.claude/sync-settings.sh
