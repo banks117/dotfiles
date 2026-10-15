@@ -75,8 +75,8 @@ return {
     local servers = {
       gopls = {},
       rust_analyzer = {},
-      terraformls = {},
       ts_ls = {},
+      tailwindcss = {},
       lua_ls = {
         settings = {
           Lua = {

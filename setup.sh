@@ -43,13 +43,6 @@ killall ControlCenter Finder Dock 2>/dev/null || true
 # update settings
 /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
 
-# install volta
-if ! which -s volta; then
-    curl https://get.volta.sh | bash
-else
-    echo "volta already installed"
-fi
-
 # install mise (manages go, node, etc.)
 if ! which -s mise; then
     curl https://mise.run | sh
