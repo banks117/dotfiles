@@ -1,35 +1,41 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  event = { "BufReadPre", "BufNewFile" },
+  branch = "main",
+  lazy = false,
   dependencies = {
     "windwp/nvim-ts-autotag",
-    "nvim-treesitter/nvim-treesitter-textobjects",
+    { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
   },
   build = ":TSUpdate",
   config = function()
-    local treesitter = require("nvim-treesitter.configs")
-
-    treesitter.setup({
-      highlight = {
-        enable = true,
-      },
-      -- enable indentation
-      indent = { enable = true },
-      -- autoclose and rename tags
-      autotag = {
-        enable = true,
-      },
-      ensure_installed = {
-        "bash",
-        "lua",
-        "go",
-        "rust",
-        "sql",
-        "vim",
-      },
-      -- Automatically install missing parsers when entering buffer
-      auto_install = true,
+    require("nvim-treesitter").install({
+      "bash",
+      "css",
+      "go",
+      "html",
+      "javascript",
+      "json",
+      "lua",
+      "markdown",
+      "markdown_inline",
+      "rust",
+      "sql",
+      "tsx",
+      "typescript",
+      "vim",
+      "vimdoc",
+      "yaml",
     })
+
+    vim.api.nvim_create_autocmd("FileType", {
+      callback = function(ev)
+        if pcall(vim.treesitter.start, ev.buf) then
+          vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
+      end,
+    })
+
+    require("nvim-ts-autotag").setup()
 
     vim.filetype.add({
       extension = {
